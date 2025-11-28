@@ -7,7 +7,6 @@ const PRODUCTS = [
     category: "Fruits & Vegetables",
     icon: "🍌",
     delivery: "Delivered in 12 mins",
-    image: "https://picsum.photos/seed/banana/400/300",
   },
   {
     id: 2,
@@ -17,7 +16,6 @@ const PRODUCTS = [
     category: "Dairy & Eggs",
     icon: "🥛",
     delivery: "Delivered in 10 mins",
-    image: "https://picsum.photos/seed/milk/400/300",
   },
   {
     id: 3,
@@ -27,7 +25,6 @@ const PRODUCTS = [
     category: "Snacks & Biscuits",
     icon: "🍪",
     delivery: "Delivered in 15 mins",
-    image: "https://picsum.photos/seed/biscuits/400/300",
   },
   {
     id: 4,
@@ -37,7 +34,6 @@ const PRODUCTS = [
     category: "Grocery & Staples",
     icon: "🍚",
     delivery: "Delivered in 18 mins",
-    image: "https://picsum.photos/seed/rice/400/300",
   },
   {
     id: 5,
@@ -47,7 +43,6 @@ const PRODUCTS = [
     category: "Fruits & Vegetables",
     icon: "🍅",
     delivery: "Delivered in 11 mins",
-    image: "https://picsum.photos/seed/tomato/400/300",
   },
   {
     id: 6,
@@ -57,7 +52,6 @@ const PRODUCTS = [
     category: "Cold Drinks & Juices",
     icon: "🥤",
     delivery: "Delivered in 16 mins",
-    image: "https://picsum.photos/seed/softdrink/400/300",
   },
   {
     id: 7,
@@ -67,7 +61,6 @@ const PRODUCTS = [
     category: "Bakery",
     icon: "🍞",
     delivery: "Delivered in 14 mins",
-    image: "httpsum.photos/seed/bread/400/300",
   },
   {
     id: 8,
@@ -77,7 +70,6 @@ const PRODUCTS = [
     category: "Snacks & Biscuits",
     icon: "🍟",
     delivery: "Delivered in 13 mins",
-    image: "https://picsum.photos/seed/chips/400/300",
   },
   {
     id: 9,
@@ -87,7 +79,6 @@ const PRODUCTS = [
     category: "Dairy & Eggs",
     icon: "🧀",
     delivery: "Delivered in 17 mins",
-    image: "https://picsum.photos/seed/yogurt/400/300",
   },
   {
     id: 10,
@@ -97,6 +88,278 @@ const PRODUCTS = [
     category: "Grocery & Staples",
     icon: "🥙",
     delivery: "Delivered in 20 mins",
-    image: "https://picsum.photos/seed/atta/400/300",
   },
 ];
+
+// -------- State --------
+let activeCategory = "All";
+let searchQuery = "";
+const cart = {}; // { productId: { product, qty } }
+
+// -------- DOM references --------
+const categoryBar = document.getElementById("category-bar");
+const productList = document.getElementById("product-list");
+const productsCount = document.getElementById("products-count");
+const searchInput = document.getElementById("search-input");
+
+const cartDrawer = document.getElementById("cart-drawer");
+const cartItemsContainer = document.getElementById("cart-items");
+const cartItemsTotal = document.getElementById("cart-items-total");
+const cartDeliveryFee = document.getElementById("cart-delivery-fee");
+const cartGrandTotal = document.getElementById("cart-grand-total");
+const cartCount = document.getElementById("cart-count");
+const bottomCartCount = document.getElementById("bottom-cart-count");
+const overlay = document.getElementById("overlay");
+const cartToggle = document.getElementById("cart-toggle");
+const cartClose = document.getElementById("cart-close");
+const bottomCartBtn = document.getElementById("bottom-cart-btn");
+
+// ---------- Init ----------
+document.addEventListener("DOMContentLoaded", () => {
+  initCategories();
+  renderProducts();
+  attachEvents();
+});
+
+// ---------- Categories ----------
+function initCategories() {
+  const categories = ["All"];
+  PRODUCTS.forEach((p) => {
+    if (!categories.includes(p.category)) {
+      categories.push(p.category);
+    }
+  });
+
+  categories.forEach((cat) => {
+    const pill = document.createElement("button");
+    pill.className = "category-pill";
+    if (cat === "All") pill.classList.add("active");
+
+    const iconSpan = document.createElement("span");
+    iconSpan.className = "icon";
+
+    if (cat === "All") {
+      iconSpan.textContent = "⭐";
+    } else {
+      const found = PRODUCTS.find((p) => p.category === cat);
+      iconSpan.textContent = found ? found.icon : "🛒";
+    }
+
+    const labelSpan = document.createElement("span");
+    labelSpan.textContent = cat;
+
+    pill.appendChild(iconSpan);
+    pill.appendChild(labelSpan);
+
+    pill.addEventListener("click", () => {
+      document
+        .querySelectorAll(".category-pill")
+        .forEach((el) => el.classList.remove("active"));
+      pill.classList.add("active");
+      activeCategory = cat;
+      renderProducts();
+    });
+
+    categoryBar.appendChild(pill);
+  });
+}
+
+// ---------- Product filtering ----------
+function getFilteredProducts() {
+  return PRODUCTS.filter((p) => {
+    const matchCategory =
+      activeCategory === "All" || p.category === activeCategory;
+    const matchSearch =
+      searchQuery.trim() === "" ||
+      p.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchCategory && matchSearch;
+  });
+}
+
+// ---------- Product render ----------
+function renderProducts() {
+  productList.innerHTML = "";
+  const filtered = getFilteredProducts();
+  productsCount.textContent = `${filtered.length} items`;
+
+  filtered.forEach((product, index) => {
+    const card = document.createElement("article");
+    card.className = "product-card";
+
+    // Image box (colored with emoji)
+    const image = document.createElement("div");
+    image.className = "product-image";
+    // har product ke liye thoda different color, index se calculate
+    const hue = (index * 40) % 360;
+    image.style.background = `linear-gradient(135deg, hsl(${hue}, 70%, 88%), hsl(${hue}, 70%, 75%))`;
+    image.style.display = "flex";
+    image.style.alignItems = "center";
+    image.style.justifyContent = "center";
+    image.style.fontSize = "2rem";
+    image.textContent = product.icon;
+
+    const name = document.createElement("div");
+    name.className = "product-name";
+    name.textContent = product.name;
+
+    const meta = document.createElement("div");
+    meta.className = "product-meta";
+    meta.textContent = product.category;
+
+    const delivery = document.createElement("div");
+    delivery.className = "product-delivery";
+    delivery.textContent = product.delivery;
+
+    const bottomRow = document.createElement("div");
+    bottomRow.className = "product-bottom-row";
+
+    const priceBox = document.createElement("div");
+    priceBox.className = "product-price";
+
+    const priceMain = document.createElement("span");
+    priceMain.className = "product-price-main";
+    priceMain.textContent = `₹${product.price}`;
+
+    const priceOld = document.createElement("span");
+    priceOld.className = "product-price-old";
+    priceOld.textContent = `₹${product.mrp}`;
+
+    priceBox.appendChild(priceMain);
+    priceBox.appendChild(priceOld);
+
+    const btn = document.createElement("button");
+    btn.className = "secondary-btn";
+    btn.textContent = "Add";
+
+    btn.addEventListener("click", () => {
+      addToCart(product);
+    });
+
+    bottomRow.appendChild(priceBox);
+    bottomRow.appendChild(btn);
+
+    card.appendChild(image);
+    card.appendChild(name);
+    card.appendChild(meta);
+    card.appendChild(delivery);
+    card.appendChild(bottomRow);
+
+    productList.appendChild(card);
+  });
+}
+
+// ---------- Search ----------
+function attachEvents() {
+  searchInput.addEventListener("input", () => {
+    searchQuery = searchInput.value;
+    renderProducts();
+  });
+
+  cartToggle.addEventListener("click", openCart);
+  cartClose.addEventListener("click", closeCart);
+  overlay.addEventListener("click", closeCart);
+  bottomCartBtn.addEventListener("click", openCart);
+}
+
+// ---------- Cart logic ----------
+function addToCart(product) {
+  if (!cart[product.id]) {
+    cart[product.id] = { product, qty: 1 };
+  } else {
+    cart[product.id].qty += 1;
+  }
+  updateCartUI();
+}
+
+function changeQty(productId, delta) {
+  const entry = cart[productId];
+  if (!entry) return;
+  entry.qty += delta;
+  if (entry.qty <= 0) {
+    delete cart[productId];
+  }
+  updateCartUI();
+}
+
+function updateCartUI() {
+  cartItemsContainer.innerHTML = "";
+
+  const entries = Object.values(cart);
+
+  if (entries.length === 0) {
+    cartItemsContainer.innerHTML =
+      '<p style="font-size:0.85rem;color:#6b7280;">Your cart is empty. Add something from Shakya Store!</p>';
+  } else {
+    entries.forEach(({ product, qty }) => {
+      const item = document.createElement("div");
+      item.className = "cart-item";
+
+      const main = document.createElement("div");
+      main.className = "cart-item-main";
+      main.textContent = product.name;
+
+      const meta = document.createElement("div");
+      meta.className = "cart-item-meta";
+      meta.textContent = `₹${product.price} x ${qty}`;
+
+      const total = document.createElement("div");
+      total.textContent = `₹${product.price * qty}`;
+
+      const actions = document.createElement("div");
+      actions.className = "cart-item-actions";
+
+      const minus = document.createElement("button");
+      minus.className = "qty-btn";
+      minus.textContent = "-";
+      minus.addEventListener("click", () => changeQty(product.id, -1));
+
+      const qtyLabel = document.createElement("span");
+      qtyLabel.textContent = qty;
+
+      const plus = document.createElement("button");
+      plus.className = "qty-btn";
+      plus.textContent = "+";
+      plus.addEventListener("click", () => changeQty(product.id, 1));
+
+      actions.appendChild(minus);
+      actions.appendChild(qtyLabel);
+      actions.appendChild(plus);
+
+      item.appendChild(main);
+      item.appendChild(meta);
+      item.appendChild(total);
+      item.appendChild(actions);
+
+      cartItemsContainer.appendChild(item);
+    });
+  }
+
+  // Totals
+  let itemsTotal = 0;
+  let itemCount = 0;
+  entries.forEach(({ product, qty }) => {
+    itemsTotal += product.price * qty;
+    itemCount += qty;
+  });
+
+  const deliveryFee = itemsTotal === 0 ? 0 : itemsTotal >= 199 ? 0 : 25;
+  const grand = itemsTotal + deliveryFee;
+
+  cartItemsTotal.textContent = `₹${itemsTotal}`;
+  cartDeliveryFee.textContent = `₹${deliveryFee}`;
+  cartGrandTotal.textContent = `₹${grand}`;
+
+  cartCount.textContent = itemCount;
+  bottomCartCount.textContent = itemCount;
+}
+
+// ---------- Cart drawer open/close ----------
+function openCart() {
+  cartDrawer.classList.add("open");
+  overlay.classList.add("visible");
+}
+
+function closeCart() {
+  cartDrawer.classList.remove("open");
+  overlay.classList.remove("visible");
+}
