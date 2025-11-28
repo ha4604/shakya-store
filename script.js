@@ -7,6 +7,7 @@ const PRODUCTS = [
     category: "Fruits & Vegetables",
     icon: "🍌",
     delivery: "Delivered in 12 mins",
+    color: "#FEF3C7", // light yellow
   },
   {
     id: 2,
@@ -16,6 +17,7 @@ const PRODUCTS = [
     category: "Dairy & Eggs",
     icon: "🥛",
     delivery: "Delivered in 10 mins",
+    color: "#DBEAFE", // light blue
   },
   {
     id: 3,
@@ -25,6 +27,7 @@ const PRODUCTS = [
     category: "Snacks & Biscuits",
     icon: "🍪",
     delivery: "Delivered in 15 mins",
+    color: "#FDE68A", // biscuit
   },
   {
     id: 4,
@@ -34,6 +37,7 @@ const PRODUCTS = [
     category: "Grocery & Staples",
     icon: "🍚",
     delivery: "Delivered in 18 mins",
+    color: "#E5E7EB",
   },
   {
     id: 5,
@@ -43,6 +47,7 @@ const PRODUCTS = [
     category: "Fruits & Vegetables",
     icon: "🍅",
     delivery: "Delivered in 11 mins",
+    color: "#FECACA",
   },
   {
     id: 6,
@@ -52,6 +57,7 @@ const PRODUCTS = [
     category: "Cold Drinks & Juices",
     icon: "🥤",
     delivery: "Delivered in 16 mins",
+    color: "#CCE5FF",
   },
   {
     id: 7,
@@ -61,6 +67,7 @@ const PRODUCTS = [
     category: "Bakery",
     icon: "🍞",
     delivery: "Delivered in 14 mins",
+    color: "#FCD9B6",
   },
   {
     id: 8,
@@ -70,6 +77,7 @@ const PRODUCTS = [
     category: "Snacks & Biscuits",
     icon: "🍟",
     delivery: "Delivered in 13 mins",
+    color: "#FFE4B5",
   },
   {
     id: 9,
@@ -79,6 +87,7 @@ const PRODUCTS = [
     category: "Dairy & Eggs",
     icon: "🧀",
     delivery: "Delivered in 17 mins",
+    color: "#E0F2FE",
   },
   {
     id: 10,
@@ -88,15 +97,16 @@ const PRODUCTS = [
     category: "Grocery & Staples",
     icon: "🥙",
     delivery: "Delivered in 20 mins",
+    color: "#E5E7EB",
   },
 ];
 
-// -------- State --------
+// ---------- State ----------
 let activeCategory = "All";
 let searchQuery = "";
 const cart = {}; // { productId: { product, qty } }
 
-// -------- DOM references --------
+// ---------- DOM references ----------
 const categoryBar = document.getElementById("category-bar");
 const productList = document.getElementById("product-list");
 const productsCount = document.getElementById("products-count");
@@ -114,6 +124,18 @@ const cartToggle = document.getElementById("cart-toggle");
 const cartClose = document.getElementById("cart-close");
 const bottomCartBtn = document.getElementById("bottom-cart-btn");
 
+// ---------- Helper: create inline SVG image ----------
+function createProductImageUrl(icon, bgColor) {
+  const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300">
+  <rect width="100%" height="100%" rx="30" ry="30" fill="${bgColor}" />
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="120">
+    ${icon}
+  </text>
+</svg>`;
+  return "data:image/svg+xml," + encodeURIComponent(svg);
+}
+
 // ---------- Init ----------
 document.addEventListener("DOMContentLoaded", () => {
   initCategories();
@@ -125,9 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function initCategories() {
   const categories = ["All"];
   PRODUCTS.forEach((p) => {
-    if (!categories.includes(p.category)) {
-      categories.push(p.category);
-    }
+    if (!categories.includes(p.category)) categories.push(p.category);
   });
 
   categories.forEach((cat) => {
@@ -182,20 +202,20 @@ function renderProducts() {
   const filtered = getFilteredProducts();
   productsCount.textContent = `${filtered.length} items`;
 
-  filtered.forEach((product, index) => {
+  filtered.forEach((product) => {
     const card = document.createElement("article");
     card.className = "product-card";
 
-    // Image box (colored with emoji)
     const image = document.createElement("div");
     image.className = "product-image";
-    const hue = (index * 40) % 360;
-    image.style.background = `linear-gradient(135deg, hsl(${hue}, 70%, 88%), hsl(${hue}, 70%, 75%))`;
-    image.style.display = "flex";
-    image.style.alignItems = "center";
-    image.style.justifyContent = "center";
-    image.style.fontSize = "2rem";
-    image.textContent = product.icon;
+
+    const imgUrl = createProductImageUrl(
+      product.icon,
+      product.color || "#E5E7EB"
+    );
+    image.style.backgroundImage = `url("${imgUrl}")`;
+    image.style.backgroundSize = "cover";
+    image.style.backgroundPosition = "center";
 
     const name = document.createElement("div");
     name.className = "product-name";
@@ -230,9 +250,7 @@ function renderProducts() {
     btn.className = "secondary-btn";
     btn.textContent = "Add";
 
-    btn.addEventListener("click", () => {
-      addToCart(product);
-    });
+    btn.addEventListener("click", () => addToCart(product));
 
     bottomRow.appendChild(priceBox);
     bottomRow.appendChild(btn);
@@ -262,27 +280,23 @@ function attachEvents() {
 
 // ---------- Cart logic ----------
 function addToCart(product) {
-  if (!cart[product.id]) {
-    cart[product.id] = { product, qty: 1 };
-  } else {
-    cart[product.id].qty += 1;
-  }
+  if (!cart[product.id]) cart[product.id] = { product, qty: 1 };
+  else cart[product.id].qty += 1;
   updateCartUI();
 }
 
 function changeQty(productId, delta) {
   const entry = cart[productId];
   if (!entry) return;
+
   entry.qty += delta;
-  if (entry.qty <= 0) {
-    delete cart[productId];
-  }
+  if (entry.qty <= 0) delete cart[productId];
+
   updateCartUI();
 }
 
 function updateCartUI() {
   cartItemsContainer.innerHTML = "";
-
   const entries = Object.values(cart);
 
   if (entries.length === 0) {
@@ -346,12 +360,11 @@ function updateCartUI() {
   cartItemsTotal.textContent = `₹${itemsTotal}`;
   cartDeliveryFee.textContent = `₹${deliveryFee}`;
   cartGrandTotal.textContent = `₹${grand}`;
-
   cartCount.textContent = itemCount;
   bottomCartCount.textContent = itemCount;
 }
 
-// ---------- Cart drawer open/close ----------
+// ---------- Cart drawer ----------
 function openCart() {
   cartDrawer.classList.add("open");
   overlay.classList.add("visible");
