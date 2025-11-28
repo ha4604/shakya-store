@@ -7,7 +7,7 @@ const PRODUCTS = [
     category: "Fruits & Vegetables",
     icon: "🍌",
     delivery: "Delivered in 12 mins",
-    image: "https://source.unsplash.com/400x300/?banana",
+    image: "https://picsum.photos/seed/banana/400/300",
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ const PRODUCTS = [
     category: "Dairy & Eggs",
     icon: "🥛",
     delivery: "Delivered in 10 mins",
-    image: "https://source.unsplash.com/400x300/?milk",
+    image: "https://picsum.photos/seed/milk/400/300",
   },
   {
     id: 3,
@@ -27,7 +27,7 @@ const PRODUCTS = [
     category: "Snacks & Biscuits",
     icon: "🍪",
     delivery: "Delivered in 15 mins",
-    image: "https://source.unsplash.com/400x300/?biscuits",
+    image: "https://picsum.photos/seed/biscuits/400/300",
   },
   {
     id: 4,
@@ -37,7 +37,7 @@ const PRODUCTS = [
     category: "Grocery & Staples",
     icon: "🍚",
     delivery: "Delivered in 18 mins",
-    image: "https://source.unsplash.com/400x300/?rice",
+    image: "https://picsum.photos/seed/rice/400/300",
   },
   {
     id: 5,
@@ -47,7 +47,7 @@ const PRODUCTS = [
     category: "Fruits & Vegetables",
     icon: "🍅",
     delivery: "Delivered in 11 mins",
-    image: "https://source.unsplash.com/400x300/?tomato",
+    image: "https://picsum.photos/seed/tomato/400/300",
   },
   {
     id: 6,
@@ -57,7 +57,7 @@ const PRODUCTS = [
     category: "Cold Drinks & Juices",
     icon: "🥤",
     delivery: "Delivered in 16 mins",
-    image: "https://source.unsplash.com/400x300/?softdrink",
+    image: "https://picsum.photos/seed/softdrink/400/300",
   },
   {
     id: 7,
@@ -67,7 +67,7 @@ const PRODUCTS = [
     category: "Bakery",
     icon: "🍞",
     delivery: "Delivered in 14 mins",
-    image: "https://source.unsplash.com/400x300/?bread",
+    image: "httpsum.photos/seed/bread/400/300",
   },
   {
     id: 8,
@@ -77,7 +77,7 @@ const PRODUCTS = [
     category: "Snacks & Biscuits",
     icon: "🍟",
     delivery: "Delivered in 13 mins",
-    image: "https://source.unsplash.com/400x300/?chips",
+    image: "https://picsum.photos/seed/chips/400/300",
   },
   {
     id: 9,
@@ -87,7 +87,7 @@ const PRODUCTS = [
     category: "Dairy & Eggs",
     icon: "🧀",
     delivery: "Delivered in 17 mins",
-    image: "https://source.unsplash.com/400x300/?yogurt",
+    image: "https://picsum.photos/seed/yogurt/400/300",
   },
   {
     id: 10,
@@ -97,6 +97,6 @@ const PRODUCTS = [
     category: "Grocery & Staples",
     icon: "🥙",
     delivery: "Delivered in 20 mins",
-    image: "https://source.unsplash.com/400x300/?wheatflour",
+    image: "https://picsum.photos/seed/atta/400/300",
   },
 ];
